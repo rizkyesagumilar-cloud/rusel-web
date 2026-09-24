@@ -13,6 +13,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 LOGIN_URL = os.environ["RUSEL_LOGIN_URL"].strip()
 EXCHANGE_URL = os.environ["RUSEL_EXCHANGE_URL"].strip()
+PUBLIC_ORIGIN = os.environ.get("RUSEL_PUBLIC_ORIGIN", "https://ruselco.foo.ng").strip().rstrip("/")
 SESSION_SECRET = os.environ["RUSEL_AUTH_SECRET"].encode("utf-8")
 ALLOWED = {
     "esa@rhayagroup.com",
@@ -99,6 +100,8 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def redirect(self, location, headers=None):
+        if location.startswith("/"):
+            location = PUBLIC_ORIGIN + location
         self.send_common(302, extra=[("Location", location)] + (headers or []))
 
     def do_GET(self):
